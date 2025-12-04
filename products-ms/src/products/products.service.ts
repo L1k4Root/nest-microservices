@@ -1,4 +1,5 @@
 import {
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
@@ -8,6 +9,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PrismaClient } from 'generated/prisma';
 import { PaginationDTO } from 'src/common';
+import { RpcException } from '@nestjs/microservices';
 
 @Injectable()
 export class ProductsService extends PrismaClient implements OnModuleInit {
@@ -50,28 +52,31 @@ export class ProductsService extends PrismaClient implements OnModuleInit {
   }
 
   async findOne(id: number) {
-    const product = await this.product.findUnique({
+    await Logger.log(`Finding product with id: ${id}`);
+    const product = await this.product.findFirst({
       where: {
         id: id,
         available: true,
       },
     });
-    if (!product) throw new NotFoundException('Product not found');
+    if (!product) throw new RpcException({
+      message: 'Product not found',
+      code: HttpStatus.NOT_FOUND,});
     return product;
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
+
+    const { id: __, ...data } = updateProductDto;
+
+
     await this.findOne(id);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { id: __, ...rest } = updateProductDto;
-
-    return await this.product.update({
-      where: {
-        id: id,
-      },
-      data: rest,
+    return this.product.update({
+      where: { id },
+      data: data,
     });
+
+
   }
 
   async remove(id: number) {
