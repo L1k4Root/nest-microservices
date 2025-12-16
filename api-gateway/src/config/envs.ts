@@ -6,6 +6,8 @@ interface EnvConfig {
   PORT: number;
   PRODUCTS_MICROSERVICE_HOST: string;
   PRODUCTS_MICROSERVICE_PORT: number;
+  ORDERS_MICROSERVICE_HOST: string;
+  ORDERS_MICROSERVICE_PORT: number;
 }
 
 const envSchema = joi
@@ -13,6 +15,8 @@ const envSchema = joi
     PORT: joi.number().default(3000),
     PRODUCTS_MICROSERVICE_HOST: joi.string().required().default('localhost'),
     PRODUCTS_MICROSERVICE_PORT: joi.number().required().default(3001),
+    ORDERS_MICROSERVICE_HOST: joi.string().required().default('localhost'),
+    ORDERS_MICROSERVICE_PORT: joi.number().required().default(3002),
   })
   .unknown(true); // Allow other variables
 
@@ -27,4 +31,6 @@ export const envConfig: EnvConfig = {
   PORT: envVars.PORT,
   PRODUCTS_MICROSERVICE_HOST: envVars.PRODUCTS_MICROSERVICE_HOST,
   PRODUCTS_MICROSERVICE_PORT: envVars.PRODUCTS_MICROSERVICE_PORT,
+  ORDERS_MICROSERVICE_HOST: envVars.ORDERS_MICROSERVICE_HOST,
+  ORDERS_MICROSERVICE_PORT: envVars.ORDERS_MICROSERVICE_PORT,
 };
