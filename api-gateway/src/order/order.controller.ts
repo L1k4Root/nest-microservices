@@ -1,10 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Logger, ParseUUIDPipe, Query } from '@nestjs/common';
-import { CreateOrderDto, OrderPaginationDTO } from './dto';
+import { CreateOrderDto, OrderPaginationDTO, ChangeOrderStatusDto } from './dto';
 import { ORDERS_SERVICE } from 'src/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-import { PaginationDTO } from 'src/common';
-import { ChangeOrderStatusDto } from './dto/change-order-status.dto';
 
 @Controller('order')
 export class OrderController {
@@ -20,8 +18,6 @@ export class OrderController {
     return this.orderClient.send('createOrder', createOrderDto);
   }
 
-
-  // TODO: Implement pagination
   @Get()
   findAll(@Query() paginationDTO: OrderPaginationDTO) {
     return this.orderClient.send('findAllOrders', paginationDTO)
@@ -38,7 +34,6 @@ export class OrderController {
   
   }
 
-  // TODO : chageOrderStatus implementation
   @Patch('change-status/:id')
   changeOrderStatus(@Param('id', ParseUUIDPipe) id: string, @Body() changeOrderStatusDto: ChangeOrderStatusDto) {
     return this.orderClient.send('changeOrderStatus', { id, status: changeOrderStatusDto.status }); 

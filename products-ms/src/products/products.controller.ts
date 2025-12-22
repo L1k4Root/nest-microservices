@@ -53,4 +53,10 @@ export class ProductsController {
   remove(@Payload() id: string) {
     return this.productsService.remove(+id);
   }
+
+  @MessagePattern({ cmd: 'validateProductsByIds'})
+  async validateProductsByIds(@Payload() ids: number[]){
+    // return ids
+    return this.productsService.validateProductsByIds(ids);
+  }
 }
