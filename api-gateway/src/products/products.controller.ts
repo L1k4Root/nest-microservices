@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, Query, NotFoundException, ParseIntPipe } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PRODUCTS_SERVICE } from 'src/config';
+import { NATS_SERVICE } from 'src/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDTO } from 'src/common';
 import { catchError, firstValueFrom } from 'rxjs';
@@ -9,17 +9,17 @@ import { catchError, firstValueFrom } from 'rxjs';
 @Controller('products')
 export class ProductsController {
   constructor(
-    @Inject(PRODUCTS_SERVICE) private readonly productsClient: ClientProxy,
+    @Inject(NATS_SERVICE) private readonly client: ClientProxy,
   ) {}
 
   @Post()
   create(@Body() createProductDto: CreateProductDto) {
-    return this.productsClient.send({ cmd: 'createProduct' }, createProductDto);
+    return this.client.send({ cmd: 'createProduct' }, createProductDto);
   }
 
   @Get()
   findAll(@Query() paginationDto: PaginationDTO) {
-    return this.productsClient.send({ cmd: 'getProducts' }, paginationDto);
+    return this.client.send({ cmd: 'getProducts' }, paginationDto);
   }
 
   @Get(':id')
@@ -32,7 +32,7 @@ export class ProductsController {
     // );
 
     try {
-      const producto = await firstValueFrom(this.productsClient.send({ cmd: 'getProduct' }, id));
+      const producto = await firstValueFrom(this.client.send({ cmd: 'getProduct' }, id));
       return producto;
       // return this.productsService.findOne(+id);
       
@@ -48,7 +48,7 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
   ) {
     console.log('Update Product DTO:', updateProductDto);
-    return this.productsClient
+    return this.client
       .send(
         { cmd: 'updateProduct' },
         {
@@ -65,6 +65,6 @@ export class ProductsController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.productsClient.send({ cmd: 'removeProduct' }, id);
+    return this.client.send({ cmd: 'removeProduct' }, id);
   }
 }
