@@ -10,30 +10,34 @@ services:
   api-gateway:
     build: ./api-gateway
     ports:
-      - "3000:3000"
+      - "${CLIENT_PORT}:3000"
     volumes:
-      - ./api-gateway:/usr/src/app/src
+      - ./api-gateway/src:/app/src
     command: npm run start:dev
     environment:
       - NATS_SERVERS=nats://nats-server:4222
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=800
+      - WATCHPACK_POLLING=true
     
   products-ms:
     build: ./products-ms
     ports:
       - "3001:3001"
     volumes:
-      - ./products-ms/src:/usr/src/app/src
+      - ./products-ms/src:/app/src
     command: npm run start:dev
     environment:
       - NATS_SERVERS=nats://nats-server:4222
       - DATABASE_URL=file:./dev.db
   
   order-ms:
+    
     build: ./order-ms
     ports:
       - "3002:3002"
     volumes:
-      - ./order-ms/src:/usr/src/app/src
+      - ./order-ms/src:/app/src
     command: npm run start:dev
     environment:
       DATABASE_URL: "postgresql://postgres:132456@order-db:5432/orderdb"
